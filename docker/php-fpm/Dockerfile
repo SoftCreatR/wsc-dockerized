@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-alpine
+FROM php:8.1-fpm-alpine AS base
 LABEL maintainer="Sascha Greuel <sascha@softcreatr.de>"
 
 RUN set -eux; \
@@ -11,10 +11,10 @@ RUN set -eux; \
 ;
 
 # Configure & Install PHP extensions
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
-
 RUN set -eux; \
-    chmod +x /usr/local/bin/install-php-extensions && IPE_GD_WITHOUTAVIF=1 install-php-extensions \
+    curl -sL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o /usr/local/bin/install-php-extensions \
+    && chmod +x /usr/local/bin/install-php-extensions \
+    && IPE_GD_WITHOUTAVIF=1 install-php-extensions \
         exif \
         intl \
         gd \
@@ -23,6 +23,8 @@ RUN set -eux; \
         pdo_mysql \
         redis \
 ;
+
+FROM base AS final
 
 # Setup entrypoint and start
 COPY ./start-container.sh /usr/local/bin/start-container

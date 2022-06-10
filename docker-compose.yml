@@ -13,7 +13,9 @@ services:
             - "80:80"
 
     php-fpm:
-        build: docker/php-fpm
+        build:
+          context: docker/php-fpm
+          target: final
         restart: always
         links:
             - mysql
